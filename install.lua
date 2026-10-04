@@ -23,17 +23,13 @@ local function install(file,url,path)
 		term.setTextColor(colors.white)
 	end
 end
-local function printUsage()
-	local programName = arg[0] or fs.getName(shell.getRunningProgram())
-	print("Usage:")
-	print(programName.." <url> [filename]")
-end
 
 local args = {...}
 local installUrl = args[1]
 local installFile = args[2]
-if #args < 1 then
-	printUsage()
+if #args == 0 then
+	local programName = arg[0] or fs.getName(shell.getRunningProgram())
+	print("Usage: "..programName.." <path>")
 	return
 end
 
