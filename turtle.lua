@@ -14,4 +14,5 @@ end
 -- Main Loop
 while true do
 	cRefuel(1,15,80)
+	sleep(0.01)
 end
