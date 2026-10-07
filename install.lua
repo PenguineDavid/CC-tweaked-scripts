@@ -5,23 +5,30 @@ local function install(file,url,path)
 	print("Installing")
 	local prevDir = shell.dir()
 	shell.setDir(path)
+	local function restore()
+		shell.setDir(prevDir)
+		if term.isColor() then
+			term.setTextColor(colors.white)
+		end
+	end
 	shell.run("wget",url,file)
 	local urlValid,failUrl = http.checkURL(url)
-	if urlValid then
-		local request,failRequest = http.get(url)
-		if failRequest ~= nil then
-			printError("Installation Aborted: "..failRequest)
-		elseif request ~= nil then
-			request.close()
-			print("Installed at \`"..path..file.."\`")
-		end
-	else
+	if not urlValid then
 		printError("Installation Aborted: "..failUrl)
+		restore()
+		return
 	end
-	shell.setDir(prevDir)
-	if term.isColor() then
-		term.setTextColor(colors.white)
+
+	local request,failRequest = http.get(url)
+	if failRequest ~= nil then
+		printError("Installation Aborted: "..failRequest)
+		restore()
+		return
+	elseif request ~= nil then
+		request.close()
+		print("Installed at \`"..path..file.."\`")
 	end
+	restore()
 end
 
 local args = {...}
@@ -42,27 +49,29 @@ else
 	write("> ")
 end
 local qInstall = read()
-if qInstall == "y" then
-	write("Install Path")
-	if term.isColor() then
-		term.setTextColor(colors.yellow)
-		write("> ")
-		term.setTextColor(colors.white)
-	else
-		write("> ")
-	end
-	local qInstallPath = read(nil,nil,function(str)
-		return fs.complete(str,"",false,false)
-	end)
-	if fs.isDir(qInstallPath) == true then
-		if fs.exists(qInstallPath..installFile) == false then
-			install(installFile,installUrl,qInstallPath)
-		else
-			printError("File already exists")
-		end
-	else
-		printError("Invalid install path")
-	end
-else
+if qInstall ~= "y" then
 	printError("Installation cancelled")
+	return
 end
+
+write("Install Path")
+if term.isColor() then
+	term.setTextColor(colors.yellow)
+	write("> ")
+	term.setTextColor(colors.white)
+else
+	write("> ")
+end
+local qInstallPath = read(nil,nil,function(str)
+	return fs.complete(str,"",false,false)
+end)
+if not fs.isDir(qInstallPath) then
+	printError("Invalid install path")
+	return
+end
+if fs.exists(qInstallPath..installFile) then
+	printError("File already exists")
+	return
+end
+
+install(installFile,installUrl,qInstallPath)
