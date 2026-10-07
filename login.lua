@@ -1,18 +1,22 @@
+-- Install Info:
+-- install https://raw.githubusercontent.com/TheInsaneCoderOG/CC-tweaked-scripts/main/login.lua login.lua
+
+-- Functions
 local function login()
-    term.clear()
-    term.setCursorPos(1,1)
-    local user,pass,confirm
-    while true do
-        write("user> ")
-        user = read()
-        write("[y/n] confirm> ")
-        confirm = read()
-        if confirm == "y" or confirm == "Y" then
-            break
-        end
-    end
+	term.clear()
+	term.setCursorPos(1,1)
+	local user,pass,confirm
+	while true do
+		write("user> ")
+		user = read()
+		write("[y/n] confirm> ")
+		confirm = read()
+		if confirm == "y" or confirm == "Y" then
+			break
+		end
+	end
  
-    if fs.exists(".dwp/user/"..user..".txt") == true then
+    if fs.exists(".dwp/users/"..user..".txt") == true then
         while true do
             write("password> ")
             pass = read("*")
@@ -22,7 +26,7 @@ local function login()
                 break
             end
         end
-        local file = fs.open(".dwp/user/"..user..".txt","r")
+        local file = fs.open(".dwp/users/"..user..".txt","r")
         local checkPass = file.readLine()
         pass = "\""..pass.."\""
         file.close()
@@ -56,7 +60,7 @@ local function login()
             sleep(1.5)
             return
         end
-        local file = fs.open(".dwp/user/"..user..".txt","w")
+        local file = fs.open(".dwp/users/"..user..".txt","w")
         while true do
             write("password> ")
             pass = read("*")
@@ -86,7 +90,7 @@ local function stopTermination()
         os.pullEventRaw("terminate")
     end
 end
- 
+
 local cologin = coroutine.create(login)
 coroutine.resume(cologin)
 login()
